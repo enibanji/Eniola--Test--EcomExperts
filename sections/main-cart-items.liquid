@@ -276,6 +276,7 @@
                           <cart-remove-button
                             id="Remove-{{ item.index | plus: 1 }}"
                             data-index="{{ item.index | plus: 1 }}"
+                            onclick ="handleRemoveButtonClick()"
                           >
                             <a
                               href="{{ item.url_to_remove }}"
@@ -449,6 +450,84 @@
     </form>
   </div>
 </cart-items>
+
+
+<script>
+ function handleRemoveButtonClick() {
+  
+      setTimeout(() => {
+        removeBundleItemFromCart();
+      }, 1000); // 1000 milliseconds = 1 seconds
+  }
+
+
+  async function isProductWithBundleInCart(productId) {
+    try {
+      const cartItems = await getCartItems();
+      console.log('cartItems', cartItems);
+
+      const isProductItem = cartItems.some((item) => {
+        return item.variant_id === productId;
+      });
+
+      return isProductItem;
+    } catch (error) {
+      console.error('Error processing product and fetch:', error);
+    }
+  }
+
+
+  async function getCartItems() {
+    console.log('getCartItems');
+
+    try {
+      // Perform the fetch to get the cart
+      const response = await fetch('/cart.js');
+
+      const data = await response.json();
+      console.log('Success:', data);
+      return data.items;
+    } catch (error) {
+      console.error('Error processing product and fetch:', error);
+    }
+  }
+
+  async function removeBundleItemFromCart() {
+    console.log('removeBundleItemFromCart');
+
+    try {
+      const productInCart = await isProductWithBundleInCart(45095064076539);
+      console.log('productInCart', productInCart);
+      if (!productInCart){
+        let updates = {
+          45092745937147: 0
+        };
+
+      // Perform the fetch to update the cart
+        const response = await fetch('/cart/update.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ updates })
+        });
+
+        const data = await response.json();
+        console.log('Success:', data);
+        if (data.item_count === 0) {
+          window.location.href = '/cart';
+        }
+      } else {
+        console.log('productInCart', productInCart);
+      }
+    } catch (error) {
+      console.error('Error processing product and fetch:', error);
+    }
+  }
+</script>
+
+
+
 
 {% schema %}
 {

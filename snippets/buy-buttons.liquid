@@ -83,6 +83,7 @@
             {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
               disabled
             {% endif %}
+            onclick="handleButtonClick()"
           >
             <span>
               {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
@@ -146,4 +147,49 @@
 
     <script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
+
+<script>
+
+  function extractVariantFromUrl(url) {
+    const match = url.match(/[?&]variant=([^&]*)/);
+    return match && match[1];
+  }
+
+
+  function handleButtonClick() {
+  // Add a 2-second delay before calling addBundleToCart
+    const extractedVariant = extractVariantFromUrl(window.location.href);
+    console.log(extractedVariant);
+    if (extractedVariant === '45095064076539') {
+      setTimeout(() => {
+        const productId = 45092745937147; // Replace with the actual productId
+        addBundleToCart(productId);
+      }, 2000); // 2000 milliseconds = 2 seconds
+    }
+  }
+  // Function to add a product to the cart
+  async function addBundleToCart(productId) {
+    console.log('addBundleToCart')
+
+      try {
+      // Product is in the cart, perform the fetch
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: productId,
+          quantity: 1, // Set a default quantity if not provided
+        }),
+      });
+
+      const data = await response.json();
+      console.log('Success:', data);
+    } catch (error) {
+      console.error('Error processing product and fetch:', error);
+    }
+  }
+</script>
 </div>
+
