@@ -149,7 +149,6 @@
   {%- endif -%}
 
 <script>
-
   function extractVariantFromUrl(url) {
     const match = url.match(/[?&]variant=([^&]*)/);
     return match && match[1];
@@ -162,17 +161,16 @@
     console.log(extractedVariant);
     if (extractedVariant === '45095064076539') {
       setTimeout(() => {
-        const productId = 45092745937147; // Replace with the actual productId
+        const productId = 45092745937147;
         addBundleToCart(productId);
       }, 2000); // 2000 milliseconds = 2 seconds
     }
   }
-  // Function to add a product to the cart
+  // Function to add a Bundle product to the cart
   async function addBundleToCart(productId) {
     console.log('addBundleToCart')
 
       try {
-      // Product is in the cart, perform the fetch
       const response = await fetch('/cart/add.js', {
         method: 'POST',
         headers: {
@@ -180,7 +178,7 @@
         },
         body: JSON.stringify({
           id: productId,
-          quantity: 1, // Set a default quantity if not provided
+          quantity: 1, 
         }),
       });
 
