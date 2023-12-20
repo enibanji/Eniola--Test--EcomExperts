@@ -241,7 +241,7 @@
                               </button>
                             {%- endif -%}
                             <quantity-input class="quantity cart-quantity">
-                              <button class="quantity__button no-js-hidden" name="minus" type="button">
+                              <button class="quantity__button no-js-hidden" name="minus" type="button" onclick="handleUpdateQuantityButtons()">
                                 <span class="visually-hidden">
                                   {{- 'products.product.quantity.decrease' | t: product: item.product.title | escape -}}
                                 </span>
@@ -265,7 +265,7 @@
                                 id="Quantity-{{ item.index | plus: 1 }}"
                                 data-index="{{ item.index | plus: 1 }}"
                               >
-                              <button class="quantity__button no-js-hidden" name="plus" type="button">
+                              <button class="quantity__button no-js-hidden" name="plus" type="button" onclick="handleUpdateQuantityButtons()">
                                 <span class="visually-hidden">
                                   {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
                                 </span>
@@ -520,6 +520,87 @@
         }
       } else {
         console.log('productInCart', productInCart);
+      }
+    } catch (error) {
+      console.error('Error processing product and fetch:', error);
+    }
+  }
+
+// Function to handle update Quantity Buttons
+  function handleUpdateQuantityButtons() {
+    setTimeout(() => {
+      updateBundleItemQuantity();
+    }, 1000); // 1000 milliseconds = 1 seconds
+  }
+
+// Function to get Bundle Item and Product with Bundle Quantity
+  async function getBundleProductsQuantity(productId) {
+    console.log('getBundleProductsQuantity');
+
+    try {
+      const cartItems = await getCartItems();
+      console.log('cartItems', cartItems);
+
+      let productWithBundleQuantity = 0;
+      let bundleItemQuantity = 0;
+
+        const productWithBundle = cartItems.find((item) => {
+          return item.variant_id === productId;
+        });
+        console.log('productWithBundle', productWithBundle);
+
+        const bundleItem = cartItems.find((item) => {
+          return item.variant_id === 45092745937147;
+        });
+      
+      if (productWithBundle) {
+       productWithBundleQuantity = productWithBundle.quantity;
+        console.log('productWithBundleQuantity', productWithBundleQuantity);
+      }
+
+      if (bundleItem) {
+        bundleItemQuantity = bundleItem.quantity;
+        console.log('bundleItemQuantity', bundleItemQuantity);
+      }
+
+      if (productWithBundleQuantity == bundleItemQuantity) {
+        return 0;
+      }
+
+      return productWithBundleQuantity;
+    } catch (error) {
+      console.error('Error processing product and fetch:', error);
+    }
+  }
+
+// Function to update bundle item quantity
+  async function updateBundleItemQuantity() {
+    console.log('updateBundleItemQuantity');
+
+    try {
+      const productWithBundleQuantity = await getBundleProductsQuantity(45095064076539);
+      console.log('productWithBundleQuantity', productWithBundleQuantity);
+      if (productWithBundleQuantity){
+        let updates = {
+          45092745937147: productWithBundleQuantity
+        };
+
+      // Perform the fetch to update the cart
+        const response = await fetch('/cart/update.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ updates })
+        });
+
+        const data = await response.json();
+        console.log('Success:', data);
+        if (data.items) {
+          window.location.href = '/cart';
+        }
+      } else {
+        console.log('Bundled products have equal quantity');
       }
     } catch (error) {
       console.error('Error processing product and fetch:', error);
