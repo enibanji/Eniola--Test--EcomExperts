@@ -1367,8 +1367,8 @@ class VariantSelects extends HTMLElement {
           `ProductSubmitButton-${sectionId}`
         );
         this.toggleAddButton(
-          addButtonUpdated ? addButtonUpdated.hasAttribute("disabled") : true,
-          window.variantStrings.soldOut
+          addButtonUpdated ? addButtonUpdated.hasAttribute("disabled") : true
+          // window.variantStrings.soldOut
         );
 
         publish(PUB_SUB_EVENTS.variantChange, {

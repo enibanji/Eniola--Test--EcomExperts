@@ -87,7 +87,11 @@
           >
             <span>
               {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
-                {{ 'products.product.sold_out' | t }}
+                {%- unless product.selected_or_first_available_variant.title contains 'Unselected' -%}
+                    {{ 'products.product.sold_out' | t }}
+                {%- else -%}
+                    {{ 'products.product.add_to_cart' | t }}
+                {%- endunless -%}
               {%- else -%}
                 {{ 'products.product.add_to_cart' | t }}
               {%- endif -%}
@@ -109,7 +113,11 @@
           class="product-form__submit button button--full-width button--primary"
           disabled
         >
-          {{ 'products.product.sold_out' | t }}
+          {%- unless product.selected_or_first_available_variant.title contains 'Unselected' -%}
+            {{ 'products.product.sold_out' | t }}
+          {%- else -%}
+            {{ 'products.product.add_to_cart' | t }}
+          {%- endunless -%}
         </button>
       </div>
     </div>
