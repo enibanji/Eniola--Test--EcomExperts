@@ -157,6 +157,7 @@
   {%- endif -%}
 
 <script>
+// Function to extract the variantID from the URL
   function extractVariantFromUrl(url) {
     const match = url.match(/[?&]variant=([^&]*)/);
     return match && match[1];
@@ -164,20 +165,18 @@
 
 
   function handleButtonClick() {
-  // Add a 2-second delay before calling addBundleToCart
     const extractedVariant = extractVariantFromUrl(window.location.href);
-    console.log(extractedVariant);
     if (extractedVariant === '45095064076539') {
       setTimeout(() => {
         const productId = 45092745937147;
         addBundleToCart(productId);
-      }, 500); // 1000 milliseconds = 1 seconds
+      }, 500); // 500 milliseconds = 0.5 seconds
     }
   }
   // Function to add a Bundle product to the cart
   async function addBundleToCart(productId) {
     console.log('addBundleToCart')
-
+      const productQuantity = document.querySelector('[data-cart-quantity]').value;
       try {
       const response = await fetch('/cart/add.js', {
         method: 'POST',
@@ -186,7 +185,7 @@
         },
         body: JSON.stringify({
           id: productId,
-          quantity: 1, 
+          quantity: productQuantity, 
         }),
       });
 
