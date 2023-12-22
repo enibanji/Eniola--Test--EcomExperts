@@ -515,9 +515,7 @@
 
         const data = await response.json();
         console.log('Success:', data);
-        if (data.item_count === 0) {
-          window.location.href = '/cart';
-        }
+        window.location.href = '/cart';
       } else {
         console.log('productInCart', productInCart);
       }
@@ -596,9 +594,7 @@
 
         const data = await response.json();
         console.log('Success:', data);
-        if (data.items) {
-          window.location.href = '/cart';
-        }
+        window.location.href = '/cart';
       } else {
         console.log('Bundled products have equal quantity');
       }
