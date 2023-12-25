@@ -9,6 +9,8 @@
   Usage:
   {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
 {% endcomment %}
+
+
 {%- unless product.has_only_default_variant -%}
   {%- if block.settings.picker_type == 'button' -%}
     <variant-radios
@@ -22,10 +24,24 @@
       {{ block.shopify_attributes }}
     >
       {%- for option in product.options_with_values -%}
-        <fieldset class="js product-form__input">
-          <legend class="form__label">{{ option.name }}</legend>
-          {% render 'product-variant-options', product: product, option: option, block: block %}
-        </fieldset>
+        {%- unless option.name == 'Size' -%}
+            <fieldset class="js product-form__input">
+              <legend class="form__label">{{ option.name }}</legend>
+              {% render 'product-variant-options', product: product, option: option, block: block %}
+            </fieldset>
+        {%- else -%}
+          <div class="select">
+              <select
+                id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                class="select__select"
+                name="options[{{ option.name | escape }}]"
+                form="{{ product_form_id }}"
+              >
+                {% render 'product-variant-options', product: product, option: option, block: block %}
+              </select>
+              {% render 'icon-caret' %}
+            </div>
+        {%- endunless -%}
       {%- endfor -%}
       <script type="application/json">
         {{ product.variants | json }}
@@ -43,22 +59,22 @@
       {{ block.shopify_attributes }}
     >
       {%- for option in product.options_with_values -%}
-        <div class="product-form__input product-form__input--dropdown">
-          <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
-            {{ option.name }}
-          </label>
-          <div class="select">
-            <select
-              id="Option-{{ section.id }}-{{ forloop.index0 }}"
-              class="select__select"
-              name="options[{{ option.name | escape }}]"
-              form="{{ product_form_id }}"
-            >
-              {% render 'product-variant-options', product: product, option: option, block: block %}
-            </select>
-            {% render 'icon-caret' %}
+          <div class="product-form__input product-form__input--dropdown">
+            <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
+              {{ option.name }}
+            </label>
+            <div class="select">
+              <select
+                id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                class="select__select"
+                name="options[{{ option.name | escape }}]"
+                form="{{ product_form_id }}"
+              >
+                {% render 'product-variant-options', product: product, option: option, block: block %}
+              </select>
+              {% render 'icon-caret' %}
+            </div>
           </div>
-        </div>
       {%- endfor -%}
 
       <script type="application/json">
@@ -120,3 +136,17 @@
     </div>
   </div>
 </noscript>
+
+{% comment %} Script to keep dropdown on UnSelect {% endcomment %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var selectElement = document.querySelector('.select__select');
+      
+      // Set the selected index to 0
+      selectElement.selectedIndex = 0;
+      
+      // Create and dispatch a change event on the select element
+      var changeEvent = new Event('change', { bubbles: true });
+      selectElement.dispatchEvent(changeEvent);
+    });
+</script>

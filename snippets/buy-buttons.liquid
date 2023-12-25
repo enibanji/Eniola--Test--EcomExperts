@@ -83,10 +83,15 @@
             {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
               disabled
             {% endif %}
+            onclick="handleButtonClick()"
           >
             <span>
               {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
-                {{ 'products.product.sold_out' | t }}
+                {%- unless product.selected_or_first_available_variant.title contains 'Unselected' -%}
+                    {{ 'products.product.sold_out' | t }}
+                {%- else -%}
+                    {{ 'products.product.add_to_cart' | t }}
+                {%- endunless -%}
               {%- else -%}
                 {{ 'products.product.add_to_cart' | t }}
               {%- endif -%}
@@ -108,7 +113,11 @@
           class="product-form__submit button button--full-width button--primary"
           disabled
         >
-          {{ 'products.product.sold_out' | t }}
+          {%- unless product.selected_or_first_available_variant.title contains 'Unselected' -%}
+            {{ 'products.product.sold_out' | t }}
+          {%- else -%}
+            {{ 'products.product.add_to_cart' | t }}
+          {%- endunless -%}
         </button>
       </div>
     </div>
@@ -146,4 +155,46 @@
 
     <script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
+
+<script>
+// Function to extract the variantID from the URL
+  function extractVariantFromUrl(url) {
+    const match = url.match(/[?&]variant=([^&]*)/);
+    return match && match[1];
+  }
+
+
+  function handleButtonClick() {
+    const extractedVariant = extractVariantFromUrl(window.location.href);
+    if (extractedVariant === '45095064076539') {
+      setTimeout(() => {
+        const productId = 45092745937147;
+        addBundleToCart(productId);
+      }, 500); // 500 milliseconds = 0.5 seconds
+    }
+  }
+  // Function to add a Bundle product to the cart
+  async function addBundleToCart(productId) {
+    console.log('addBundleToCart')
+      const productQuantity = document.querySelector('[data-cart-quantity]').value;
+      try {
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: productId,
+          quantity: productQuantity, 
+        }),
+      });
+
+      const data = await response.json();
+      console.log('Success:', data);
+    } catch (error) {
+      console.error('Error processing product and fetch:', error);
+    }
+  }
+</script>
 </div>
+
